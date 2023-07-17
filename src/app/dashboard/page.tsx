@@ -150,30 +150,26 @@ const RecruitmentStatusPage = async () => {
                   className={
                     index % 2 == 0
                       ? 'relative row-span-2 mt-auto '
-                      : 'relative row-span-1 '
+                      : 'relative row-span-1 mb-auto h-full'
                   }
                   key={index}
                 >
                   {index % 2 == 0 ? (
-                    <div>
-                      <div className=' flex flex-col  items-center '>
-                        <div className='absolute'>
-                          <ProgressIconDown />
-                        </div>
+                    <div className=' flex flex-col  items-center '>
+                      <div className=''>
+                        <ProgressIconDown />
                       </div>
-                      <div className='ml-4 mt-2 pt-5 md:ml-0'>
-                        <h4 className='mb-1.5 '>{line1}</h4>
+                      <div className='ml-4 text-center  md:ml-0'>
+                        <h4 className=' '>{line1}</h4>
                       </div>
                     </div>
                   ) : (
-                    <div>
-                      <div className=' flex flex-col items-center '>
-                        <div className='absolute -bottom-[7px] right-5'>
-                          <ProgressIconUp />
-                        </div>
-                        <div className='ml-4 mt-2 pb-4 md:ml-0'>
-                          <h4 className='mb-1.5 '>{line1}</h4>
-                        </div>
+                    <div className=' flex flex-col justify-end mt-auto items-center h-full '>
+                      <div className='ml-4 text-center   md:ml-0'>
+                        <h4 className=' '>{line1}</h4>
+                      </div>
+                      <div className='flex  items-end'>
+                        <ProgressIconUp />
                       </div>
                     </div>
                   )}
