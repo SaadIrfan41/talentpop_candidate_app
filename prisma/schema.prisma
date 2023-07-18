@@ -75,6 +75,19 @@ model Customer {
   // isSubscribed     Boolean @default(false)
 }
 
+model Candidate {
+  id                             String               @id @default(cuid())
+  company_name                   String
+  phone_number                   String               @unique
+  password                       String               @unique
+  created_at                     DateTime             @default(now())
+  updated_at                     DateTime             @updatedAt
+  candidate_intake_form_submited Boolean              @default(false)
+  candidate_intake_form          CandidateIntakeForm?
+  accounts                       Account[]
+  sessions                       Session[]
+}
+
 model CustomerIntakeForm {
   id                           String   @id @default(cuid())
   customer                     Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
@@ -108,7 +121,9 @@ model CustomerIntakeForm {
 }
 
 model CandidateIntakeForm {
-  id                                  String   @id @default(cuid())
+  id                                  String    @id @default(cuid())
+  candidate                           Candidate @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+  candidate_id                        String    @unique
   firstName                           String
   lastName                            String
   email                               String
@@ -158,8 +173,8 @@ model CandidateIntakeForm {
   validID                             String
   activelyCheckEmail                  Boolean
   interestedInTraning                 String
-  created_at                          DateTime @default(now()) @db.Timestamptz(0)
-  updated_at                          DateTime @updatedAt @db.Timestamptz(0)
+  created_at                          DateTime  @default(now()) @db.Timestamptz(0)
+  updated_at                          DateTime  @updatedAt @db.Timestamptz(0)
 }
 
 // type Photo {
@@ -168,7 +183,7 @@ model CandidateIntakeForm {
 //   url    String
 // }
 model Account {
-  id                 String    @id @default(cuid())
+  id                 String     @id @default(cuid())
   userId             String
   providerType       String
   providerId         String
@@ -176,9 +191,11 @@ model Account {
   refreshToken       String?
   accessToken        String?
   accessTokenExpires DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               Customer  @relation(fields: [userId], references: [id])
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  user               Customer   @relation(fields: [userId], references: [id])
+  Candidate          Candidate? @relation(fields: [candidateId], references: [id])
+  candidateId        String?
 
   @@unique([providerId, providerAccountId])
 }
@@ -195,12 +212,14 @@ model VerificationRequest {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   userId       String
   expires      DateTime
-  sessionToken String   @unique
-  accessToken  String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         Customer @relation(fields: [userId], references: [id])
+  sessionToken String     @unique
+  accessToken  String     @unique
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         Customer   @relation(fields: [userId], references: [id])
+  Candidate    Candidate? @relation(fields: [candidateId], references: [id])
+  candidateId  String?
 }

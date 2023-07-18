@@ -6,6 +6,7 @@ import { headers, cookies } from 'next/headers'
 // import { getToken } from 'next-auth/jwt'
 import { prisma } from '../../../../prisma/prisma'
 import { CandidateIntakeFormSchema } from '@/lib/validations/CandidateFormValidation/validations'
+import { getToken } from 'next-auth/jwt'
 
 // const allowedFormats = [
 //   'application/pdf',
@@ -141,20 +142,20 @@ export async function POST(request: NextRequest) {
       interestedInTraning,
     } = res.data
 
-    // const mostCommonQuestions = JSON.stringify(commonQuestions)
-    // const session = await getToken({
-    //   req: request,
-    //   secret: process.env.NEXTAUTH_SECRET,
-    //   secureCookie: process.env.NODE_ENV === 'production',
-    // })
-    // if (!session)
-    //   return NextResponse.json(
-    //     { message: 'UNAUTHORIZED USER' },
-    //     { status: 401 }
-    //   )
-    // console.log(session)
-    const form = await prisma.candidateIntakeForm.create({
+    const session = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+      secureCookie: process.env.NODE_ENV === 'production',
+    })
+    if (!session)
+      return NextResponse.json(
+        { message: 'UNAUTHORIZED USER' },
+        { status: 401 }
+      )
+    console.log(session)
+    await prisma.candidateIntakeForm.create({
       data: {
+        candidate_id: session?.sub as string,
         firstName,
         lastName,
         email,
@@ -206,18 +207,18 @@ export async function POST(request: NextRequest) {
         interestedInTraning,
       },
     })
-    // const hours = form.agent_working_hours
-    // const days = form.agent_working_days
-    // const billing_period = 2
-    // const numbOfAgents = form.num_of_agents
-    // const agentsTotalPrice = hours * days * billing_period * 8 * numbOfAgents
-    // const agentsPriceAfterTax = (13 / 100) * agentsTotalPrice
-    //  const agentsPriceAfterTaxRounded = Math.round(agentsPriceAfterTax * 100) / 100
+    const updatedCustomer = await prisma.candidate.update({
+      where: {
+        id: session?.sub as string,
+      },
+      data: {
+        candidate_intake_form_submited: true,
+      },
+    })
 
     return NextResponse.json(
       {
-        message: 'Form Submited Successfully',
-        // formSubmited: updatedCustomer.customer_intake_form_submited,
+        formSubmited: updatedCustomer.candidate_intake_form_submited,
         // invoice: Invoice,
       },
       { status: 200 }

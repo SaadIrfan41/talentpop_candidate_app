@@ -34,8 +34,11 @@ import { softwareToolsNames } from '@/components/staticData'
 import { useCandidateIntakeFormStore } from '@/store/useCandidateIntakeFormStore'
 import useStepper from '@/store/useStepperStore'
 import { Loader2 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 const Step3 = () => {
+  const { data: session, update } = useSession()
+
   const [animateRef] = useAutoAnimate()
   const { setStep3Data, step3Data, getCombinedData } =
     useCandidateIntakeFormStore((state) => state)
@@ -154,14 +157,15 @@ const Step3 = () => {
       const response = await res.json()
       console.log(response)
       if (response.message === 'Form Submited Successfully')
-        router.push('/dashboard')
-      // await update({
-      //   ...session,
-      //   user: {
-      //     ...session?.user,
-      //     customerIntakeFormSubmited: response.formSubmited,
-      //   },
-      // })
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            candidateIntakeFormSubmited: response.formSubmited,
+          },
+        })
+      router.push('/dashboard')
+
       // router.push('/invoice')
     } catch (error) {
       console.log('ERROR INS RESPONSE', error)
